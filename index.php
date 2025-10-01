@@ -1400,6 +1400,10 @@ try {
           $yesterday = date('Y-m-d', strtotime('-1 day'));
           $monthStart = date('Y-m-01'); // First day of current month
           
+          // For "This Month" calculation, we need to compare to the last month-end date
+          // If today is the 1st of the month, compare to the last day of the previous month
+          $lastMonthEnd = date('Y-m-t', strtotime('-1 month')); // Last day of previous month
+          
           // Calculate UK tax year start (6 April)
           $currentYear = date('Y');
           $currentMonth = date('n');
@@ -1432,8 +1436,8 @@ try {
           $stmt->execute([$yesterday]);
           $yesterdayTotal = (float)($stmt->fetch()['total_portfolio'] ?? 0);
           
-          $stmt->execute([$monthStart]);
-          $monthStartTotal = (float)($stmt->fetch()['total_portfolio'] ?? 0);
+          $stmt->execute([$lastMonthEnd]);
+          $lastMonthEndTotal = (float)($stmt->fetch()['total_portfolio'] ?? 0);
           
           $stmt->execute([$taxYearStart]);
           $taxYearStartTotal = (float)($stmt->fetch()['total_portfolio'] ?? 0);
@@ -1458,17 +1462,17 @@ try {
             $todayDepositsWithdrawals += (float)($stmt->fetch()['total'] ?? 0);
           }
           
-          // Deposits/withdrawals this month
+          // Deposits/withdrawals since last month-end
           $monthDepositsWithdrawals = 0;
           foreach ($accounts as [$client, $account]) {
             $stmt = $pdo->prepare("
               SELECT SUM(value_gbp) as total
               FROM hl_transactions
               WHERE client_name = ? AND account_type = ? 
-              AND trade_date >= ? AND trade_date <= ?
+              AND trade_date > ? AND trade_date <= ?
               AND type IN ('Deposit', 'Withdrawal')
             ");
-            $stmt->execute([$client, $account, $monthStart, $today]);
+            $stmt->execute([$client, $account, $lastMonthEnd, $today]);
             $monthDepositsWithdrawals += (float)($stmt->fetch()['total'] ?? 0);
           }
           
@@ -1488,7 +1492,7 @@ try {
           
           // Calculate gain/loss by subtracting deposits/withdrawals from today's value
           $todayGainLoss = ($currentTotal - $todayDepositsWithdrawals) - $yesterdayTotal;
-          $monthGainLoss = ($currentTotal - $monthDepositsWithdrawals) - $monthStartTotal;
+          $monthGainLoss = ($currentTotal - $monthDepositsWithdrawals) - $lastMonthEndTotal; // Compare to last month-end (e.g., Sept 30th)
           $taxYearGainLoss = ($currentTotal - $taxYearDepositsWithdrawals) - $taxYearStartTotal;
           
           // Determine colors based on positive/negative
