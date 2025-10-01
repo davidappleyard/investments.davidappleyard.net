@@ -144,8 +144,8 @@ if (is_logged_in()) {
 <body>
     <div class="login-container">
         <div class="login-header">
-            <h1>Investment Tool</h1>
-            <p>Secure access to your portfolio</p>
+            <h1>Investment Reporting</h1>
+            <p>Secure access to reporting and analysis</p>
         </div>
         
         <?php if (isset($login_error)): ?>
@@ -173,15 +173,6 @@ if (is_logged_in()) {
             <button type="submit" name="login" class="btn">Login</button>
         </form>
         
-        <div class="security-info">
-            <h4>🔒 Security Features</h4>
-            <ul>
-                <li>Passwords are securely hashed</li>
-                <li>Remember me uses secure tokens</li>
-                <li>Session management with automatic expiry</li>
-                <li>Database-backed authentication</li>
-            </ul>
-        </div>
     </div>
 </body>
 </html>
