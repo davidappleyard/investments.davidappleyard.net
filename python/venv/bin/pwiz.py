@@ -1,4 +1,4 @@
-#!/var/www/html/davidappleyard.net/public_html/investments/python/venv/bin/python3
+#!/var/www/html/investments.davidappleyard.net/public_html/python/venv/bin/python3
 
 import datetime
 import os

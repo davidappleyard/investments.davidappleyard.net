@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV=/var/www/html/davidappleyard.net/public_html/investments/python/venv
+VIRTUAL_ENV=/var/www/html/investments.davidappleyard.net/public_html/python/venv
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
