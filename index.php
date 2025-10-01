@@ -2470,7 +2470,7 @@ try {
           $monthEndPortfolio = $stmt->fetchAll();
           
           // Function to calculate month-over-month changes excluding deposits/withdrawals
-          function calculate_mom_change(PDO $pdo, $currentValue, $previousValue, $accounts, $isToday = false, $lastMonthEndDate = null) {
+          function calculate_mom_change(PDO $pdo, $currentValue, $previousValue, $accounts, $isToday = false, $lastMonthEndDate = null, $currentDate = null) {
             if (!$previousValue) return null;
             
             if ($isToday && $lastMonthEndDate) {
@@ -2479,8 +2479,14 @@ try {
               $endDate = date('Y-m-d');
             } else {
               // For month-end rows, look at deposits/withdrawals for the current month
-              $startDate = date('Y-m-01', strtotime($currentValue));
-              $endDate = date('Y-m-t', strtotime($currentValue));
+              if ($currentDate) {
+                $startDate = date('Y-m-01', strtotime($currentDate));
+                $endDate = date('Y-m-t', strtotime($currentDate));
+              } else {
+                // Fallback: assume current month if no date provided
+                $startDate = date('Y-m-01');
+                $endDate = date('Y-m-t');
+              }
             }
             
             $stmt = $pdo->prepare("
@@ -2489,6 +2495,7 @@ try {
                 SUM(CASE WHEN type = 'Withdrawal' THEN ABS(value_gbp) ELSE 0 END) as withdrawals
               FROM hl_transactions 
               WHERE trade_date >= ? AND trade_date <= ?
+              AND type IN ('Deposit', 'Withdrawal')
             ");
             $stmt->execute([$startDate, $endDate]);
             $cashFlow = $stmt->fetch();
@@ -2497,6 +2504,8 @@ try {
             $withdrawals = (float)($cashFlow['withdrawals'] ?? 0);
             
             // Calculate adjusted current value (subtract deposits, add withdrawals)
+            // Deposits inflate the portfolio value, so subtract them to get true growth
+            // Withdrawals deflate the portfolio value, so add them back to get true growth
             $adjustedCurrent = $currentValue - $deposits + $withdrawals;
             
             // Calculate change
@@ -2543,7 +2552,7 @@ try {
             if ($index > 0) {
               // Calculate MoM change for this month vs previous month
               $previousMonth = $filteredMonthEnd[$index - 1]['total_portfolio'];
-              $momChange = calculate_mom_change($pdo, $row['total_portfolio'], $previousMonth, $accounts, false);
+              $momChange = calculate_mom_change($pdo, $row['total_portfolio'], $previousMonth, $accounts, false, null, $row['month_end']);
               $monthlyGrowthData[] = $momChange ? $momChange['change'] : 0;
             } else {
               // First month has no previous month to compare to
@@ -2672,7 +2681,7 @@ try {
               <?php
                 // Calculate MoM change for this month vs previous month
                 $previousMonth = isset($monthEndPortfolio[$index + 1]) ? $monthEndPortfolio[$index + 1]['total_portfolio'] : null;
-                $momChange = calculate_mom_change($pdo, $row['total_portfolio'], $previousMonth, $accounts, false);
+                $momChange = calculate_mom_change($pdo, $row['total_portfolio'], $previousMonth, $accounts, false, null, $row['month_end']);
               ?>
               <tr class="<?= $index >= 20 ? 'performance-row-hidden' : 'performance-row-visible' ?>" data-table="total-portfolio">
                 <td class="mono"><?=h($row['month_end'])?></td>
