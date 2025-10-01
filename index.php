@@ -2238,12 +2238,6 @@ try {
             <p><strong>Net Cash Flow:</strong> £<?= number_format($netCashFlow, 2) ?> <?= $netCashFlow > 0 ? '(outflow)' : '(inflow)' ?></p>
             <p><strong>Current Cash:</strong> £<?= number_format($data['cash_balance'], 2) ?></p>
             <p><strong>Final Cash Balance:</strong> £<?= number_format($finalCashBalance, 2) ?></p>
-            
-            <?php if ($finalCashBalance >= $data['cash_buffer']): ?>
-              <p style="color: #28a745; font-weight: bold;">✅ Rebalancing maintains £<?= number_format($data['cash_buffer'], 2) ?> cash buffer</p>
-            <?php else: ?>
-              <p style="color: #dc3545; font-weight: bold;">⚠️ Final cash would be below £<?= number_format($data['cash_buffer'], 2) ?> buffer</p>
-            <?php endif; ?>
           </div>
         </div>
         <?php endif; ?>
