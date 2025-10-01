@@ -1,0 +1,67 @@
+=== Daily Historical Account Values Update ===
+Target date: 2025-09-30
+Started at: 2025-09-30 18:00:02
+
+Processing 6 account combinations for date 2025-09-30...
+
+  Processed David SIPP: Holdings £290,626.18, Cash £112.70, Total £290,738.88
+  Processed David ISA: Holdings £300,626.01, Cash £70.05, Total £300,696.06
+  Processed David Fund & Share: Holdings £245,672.51, Cash £323.58, Total £245,996.09
+  Processed Jen SIPP: Holdings £289,294.65, Cash £118.22, Total £289,412.87
+  Processed Jen ISA: Holdings £183,562.78, Cash £104.85, Total £183,667.63
+  Processed Jen Fund & Share: Holdings £250,265.67, Cash £452.38, Total £250,718.05
+
+=== Daily Update Complete ===
+Target date: 2025-09-30
+Processed records: 6
+Skipped records: 0
+Total time: 1 seconds
+Completed at: 2025-09-30 18:00:03
+
+Successfully updated historical values for 2025-09-30.
+
+
+=== Daily Historical Account Values Update ===
+Target date: 2025-09-29
+Started at: 2025-09-29 18:00:02
+
+Processing 6 account combinations for date 2025-09-29...
+
+  Skipping David SIPP - record already exists for 2025-09-29
+  Skipping David ISA - record already exists for 2025-09-29
+  Skipping David Fund & Share - record already exists for 2025-09-29
+  Skipping Jen SIPP - record already exists for 2025-09-29
+  Skipping Jen ISA - record already exists for 2025-09-29
+  Skipping Jen Fund & Share - record already exists for 2025-09-29
+
+=== Daily Update Complete ===
+Target date: 2025-09-29
+Processed records: 0
+Skipped records: 6
+Total time: 0 seconds
+Completed at: 2025-09-29 18:00:02
+
+No new records were created (all records already existed).
+
+
+=== Daily Historical Account Values Update ===
+Target date: 2025-09-29
+Started at: 2025-09-29 17:49:21
+
+Processing 6 account combinations for date 2025-09-29...
+
+  Skipping David SIPP - record already exists for 2025-09-29
+  Skipping David ISA - record already exists for 2025-09-29
+  Skipping David Fund & Share - record already exists for 2025-09-29
+  Skipping Jen SIPP - record already exists for 2025-09-29
+  Skipping Jen ISA - record already exists for 2025-09-29
+  Skipping Jen Fund & Share - record already exists for 2025-09-29
+
+=== Daily Update Complete ===
+Target date: 2025-09-29
+Processed records: 0
+Skipped records: 6
+Total time: 0 seconds
+Completed at: 2025-09-29 17:49:21
+
+No new records were created (all records already existed).

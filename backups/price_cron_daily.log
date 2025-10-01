@@ -1,0 +1,124 @@
+Daily Price Fetcher - 2025-09-26 04:47:33
+============================================================
+Target date: 2025-09-26 (Friday)
+Found 9 active symbols
+
+[1/9] Processing VAPX (VAPX.L)...
+  [MISS] No price data for 2025-09-26
+[2/9] Processing VERX (VERX.L)...
+  [MISS] No price data for 2025-09-26
+[3/9] Processing VEVE (VEVE.L)...
+  [MISS] No price data for 2025-09-26
+[4/9] Processing VFEM (VFEM.L)...
+  [MISS] No price data for 2025-09-26
+[5/9] Processing VHVG (VHVG.L)...
+  [MISS] No price data for 2025-09-26
+[6/9] Processing VJPN (VJPN.L)...
+  [MISS] No price data for 2025-09-26
+[7/9] Processing VMID (VMID.L)...
+  [MISS] No price data for 2025-09-26
+[8/9] Processing VUKE (VUKE.L)...
+  [MISS] No price data for 2025-09-26
+[9/9] Processing VUSA (VUSA.L)...
+  [MISS] No price data for 2025-09-26
+
+============================================================
+SUMMARY
+Target date: 2025-09-26
+Symbols processed: 0/9
+Successful: 0
+Failed: 9
+Completed at: 2025-09-26 04:47:34
+Daily Price Fetcher - 2025-09-26 18:00:05
+============================================================
+Target date: 2025-09-26 (Friday)
+Found 9 active symbols
+
+[1/9] Processing VAPX (VAPX.L)...
+  [OK] Price: 21.96500015258789 GBP @ 2025-09-26 16:00:00 UTC
+[2/9] Processing VERX (VERX.L)...
+  [OK] Price: 37.47999954223633 GBP @ 2025-09-26 16:00:00 UTC
+[3/9] Processing VEVE (VEVE.L)...
+  [OK] Price: 91.87000274658203 GBP @ 2025-09-26 16:00:00 UTC
+[4/9] Processing VFEM (VFEM.L)...
+  [OK] Price: 54.619998931884766 GBP @ 2025-09-26 16:00:00 UTC
+[5/9] Processing VHVG (VHVG.L)...
+  [OK] Price: 95.86000061035156 GBP @ 2025-09-26 16:00:00 UTC
+[6/9] Processing VJPN (VJPN.L)...
+  [OK] Price: 32.01750183105469 GBP @ 2025-09-26 16:00:00 UTC
+[7/9] Processing VMID (VMID.L)...
+  [OK] Price: 32.97999954223633 GBP @ 2025-09-26 16:00:00 UTC
+[8/9] Processing VUKE (VUKE.L)...
+  [OK] Price: 40.32500076293945 GBP @ 2025-09-26 16:00:00 UTC
+[9/9] Processing VUSA (VUSA.L)...
+  [OK] Price: 93.56500244140625 GBP @ 2025-09-26 16:00:00 UTC
+
+============================================================
+SUMMARY
+Target date: 2025-09-26
+Symbols processed: 9/9
+Successful: 9
+Failed: 0
+Completed at: 2025-09-26 18:00:14
+Daily Price Fetcher - 2025-09-27 18:00:05
+============================================================
+Target date: 2025-09-26 (Friday)
+Found 9 active symbols
+
+[1/9] Processing VAPX (VAPX.L)...
+  [OK] Price: 21.96500015258789 GBP @ 2025-09-26 16:00:00 UTC
+[2/9] Processing VERX (VERX.L)...
+  [OK] Price: 37.47999954223633 GBP @ 2025-09-26 16:00:00 UTC
+[3/9] Processing VEVE (VEVE.L)...
+  [OK] Price: 91.87000274658203 GBP @ 2025-09-26 16:00:00 UTC
+[4/9] Processing VFEM (VFEM.L)...
+  [OK] Price: 54.619998931884766 GBP @ 2025-09-26 16:00:00 UTC
+[5/9] Processing VHVG (VHVG.L)...
+  [OK] Price: 95.86000061035156 GBP @ 2025-09-26 16:00:00 UTC
+[6/9] Processing VJPN (VJPN.L)...
+  [OK] Price: 32.01750183105469 GBP @ 2025-09-26 16:00:00 UTC
+[7/9] Processing VMID (VMID.L)...
+  [OK] Price: 32.97999954223633 GBP @ 2025-09-26 16:00:00 UTC
+[8/9] Processing VUKE (VUKE.L)...
+  [OK] Price: 40.32500076293945 GBP @ 2025-09-26 16:00:00 UTC
+[9/9] Processing VUSA (VUSA.L)...
+  [OK] Price: 93.56500244140625 GBP @ 2025-09-26 16:00:00 UTC
+
+============================================================
+SUMMARY
+Target date: 2025-09-26
+Symbols processed: 9/9
+Successful: 9
+Failed: 0
+Completed at: 2025-09-27 18:00:14
+Daily Price Fetcher - 2025-09-28 18:00:05
+============================================================
+Target date: 2025-09-26 (Friday)
+Found 9 active symbols
+
+[1/9] Processing VAPX (VAPX.L)...
+  [OK] Price: 21.96500015258789 GBP @ 2025-09-26 16:00:00 UTC
+[2/9] Processing VERX (VERX.L)...
+  [OK] Price: 37.47999954223633 GBP @ 2025-09-26 16:00:00 UTC
+[3/9] Processing VEVE (VEVE.L)...
+  [OK] Price: 91.87000274658203 GBP @ 2025-09-26 16:00:00 UTC
+[4/9] Processing VFEM (VFEM.L)...
+  [OK] Price: 54.619998931884766 GBP @ 2025-09-26 16:00:00 UTC
+[5/9] Processing VHVG (VHVG.L)...
+  [OK] Price: 95.86000061035156 GBP @ 2025-09-26 16:00:00 UTC
+[6/9] Processing VJPN (VJPN.L)...
+  [OK] Price: 32.01750183105469 GBP @ 2025-09-26 16:00:00 UTC
+[7/9] Processing VMID (VMID.L)...
+  [OK] Price: 32.97999954223633 GBP @ 2025-09-26 16:00:00 UTC
+[8/9] Processing VUKE (VUKE.L)...
+  [OK] Price: 40.32500076293945 GBP @ 2025-09-26 16:00:00 UTC
+[9/9] Processing VUSA (VUSA.L)...
+  [OK] Price: 93.56500244140625 GBP @ 2025-09-26 16:00:00 UTC
+
+============================================================
+SUMMARY
+Target date: 2025-09-26
+Symbols processed: 9/9
+Successful: 9
+Failed: 0
+Completed at: 2025-09-28 18:00:14
