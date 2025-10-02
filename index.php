@@ -1462,14 +1462,14 @@ try {
             $todayDepositsWithdrawals += (float)($stmt->fetch()['total'] ?? 0);
           }
           
-          // Deposits/withdrawals since last month-end
+          // Deposits/withdrawals since last month-end (excluding today)
           $monthDepositsWithdrawals = 0;
           foreach ($accounts as [$client, $account]) {
             $stmt = $pdo->prepare("
               SELECT SUM(value_gbp) as total
               FROM hl_transactions
               WHERE client_name = ? AND account_type = ? 
-              AND trade_date > ? AND trade_date <= ?
+              AND trade_date > ? AND trade_date < ?
               AND type IN ('Deposit', 'Withdrawal')
             ");
             $stmt->execute([$client, $account, $lastMonthEnd, $today]);
@@ -1491,8 +1491,13 @@ try {
           }
           
           // Calculate gain/loss by subtracting deposits/withdrawals from today's value
+          // For "Today": compare today's value (minus today's deposits/withdrawals) to yesterday's value
           $todayGainLoss = ($currentTotal - $todayDepositsWithdrawals) - $yesterdayTotal;
-          $monthGainLoss = ($currentTotal - $monthDepositsWithdrawals) - $lastMonthEndTotal; // Compare to last month-end (e.g., Sept 30th)
+          
+          // For "This Month": compare today's value (minus all deposits/withdrawals since last month-end) to last month-end's value
+          $monthGainLoss = ($currentTotal - $monthDepositsWithdrawals - $todayDepositsWithdrawals) - $lastMonthEndTotal;
+          
+          // For "This Tax Year": compare today's value (minus all deposits/withdrawals since tax year start) to tax year start value
           $taxYearGainLoss = ($currentTotal - $taxYearDepositsWithdrawals) - $taxYearStartTotal;
           
           // Determine colors based on positive/negative
