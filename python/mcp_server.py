@@ -677,5 +677,7 @@ def get_allocation_breakdown(
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    import uvicorn
     print(f"Starting Investment Portfolio MCP server on {MCP_HOST}:{MCP_PORT}")
-    mcp.run(transport="streamable-http", host=MCP_HOST, port=MCP_PORT)
+    app = mcp.streamable_http_app()
+    uvicorn.run(app, host=MCP_HOST, port=MCP_PORT, log_level="warning")
