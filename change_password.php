@@ -1,9 +1,4 @@
 <?php
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once 'auth.php';
 
 // Redirect to login if not authenticated
@@ -17,31 +12,31 @@ $error = '';
 
 // Handle password change form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
+    require_csrf();
     $current_password = $_POST['current_password'] ?? '';
-    $new_password = $_POST['new_password'] ?? '';
+    $new_password     = $_POST['new_password']     ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-    
+
     if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
         $error = "All fields are required.";
     } elseif ($new_password !== $confirm_password) {
         $error = "New passwords do not match.";
-    } elseif (strlen($new_password) < 6) {
-        $error = "New password must be at least 6 characters long.";
+    } elseif (strlen($new_password) < 12) {
+        $error = "New password must be at least 12 characters long.";
     } else {
         try {
-            $pdo = db();
-            
-            // Verify current password
+            $pdo  = db();
             $stmt = $pdo->prepare("SELECT password_hash FROM users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             $user = $stmt->fetch();
-            
+
             if ($user && password_verify($current_password, $user['password_hash'])) {
-                // Update password
                 $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
-                $stmt->execute([$new_hash, $_SESSION['user_id']]);
-                
+                $pdo->prepare(
+                    "UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?"
+                )->execute([$new_hash, $_SESSION['user_id']]);
+
+                unset($_SESSION['must_change_password']);
                 $message = "Password changed successfully!";
             } else {
                 $error = "Current password is incorrect.";
@@ -187,19 +182,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
         <?php endif; ?>
         
         <form method="POST">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <label for="current_password">Current Password</label>
                 <input type="password" id="current_password" name="current_password" required>
             </div>
-            
+
             <div class="form-group">
-                <label for="new_password">New Password</label>
-                <input type="password" id="new_password" name="new_password" required minlength="6">
+                <label for="new_password">New Password (minimum 12 characters)</label>
+                <input type="password" id="new_password" name="new_password" required minlength="12">
             </div>
-            
+
             <div class="form-group">
                 <label for="confirm_password">Confirm New Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="12">
             </div>
             
             <button type="submit" name="change_password" class="btn">Change Password</button>

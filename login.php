@@ -155,6 +155,7 @@ if (is_logged_in()) {
         <?php endif; ?>
         
         <form method="POST">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required autocomplete="username">

@@ -8,11 +8,16 @@ import pytz
 import yfinance as yf
 import mysql.connector
 
-# --- Config: prefer env vars in production
+# --- Config: read from environment variables (set via .env or cron environment)
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_NAME = os.getenv("DB_NAME", "investments")
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASS", "gN6mCgrP!Gi6z9gxp")
+DB_PASS = os.getenv("DB_PASS")
+if DB_PASS is None:
+    raise RuntimeError(
+        "DB_PASS environment variable must be set. "
+        "See .env.example. For cron: export DB_PASS=yourpassword before running."
+    )
 
 UTC = pytz.UTC
 

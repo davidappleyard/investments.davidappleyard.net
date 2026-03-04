@@ -19,25 +19,11 @@ if (!function_exists('str_contains')) {
     }
 }
 
-// ---- DB CONFIG ----
-const DB_HOST = 'localhost';
-const DB_NAME = 'investments';
-const DB_USER = 'root';
-const DB_PASS = 'gN6mCgrP!Gi6z9gxp';
-const DB_CHARSET = 'utf8mb4';
-
 // ---- SECURE AUTHENTICATION ----
+// Credentials loaded from .env via auth.php → load_env.php
 require_once 'auth.php';
 
-function enforce_secure_auth(): void {
-    // Redirect to login if not authenticated
-    if (!is_logged_in()) {
-        header('Location: login.php');
-        exit;
-    }
-}
-
-// Enforce auth and set anti-indexing header very early
+// enforce_secure_auth() is defined in auth.php
 enforce_secure_auth();
 header('X-Robots-Tag: noindex, nofollow', true);
 
@@ -855,6 +841,7 @@ $summary = null;
 $parsed_client = ['name'=>'', 'number'=>''];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     if (isset($_POST['rollback_batch_id']) && trim((string)$_POST['rollback_batch_id']) !== '') {
         try {
             $pdo = db();
@@ -2264,6 +2251,7 @@ try {
       <div class="card">
         <h2>Import Transactions</h2>
         <form method="post">
+          <?= csrf_field() ?>
           <div class="grid">
             <div>
               <label for="account_type">Account Type</label>
@@ -2316,6 +2304,7 @@ try {
       <div class="card">
         <h2>Rollback Import</h2>
         <form method="post">
+          <?= csrf_field() ?>
           <div class="grid">
             <div>
               <label for="rollback_batch_id">Rollback Import (Batch ID)</label>

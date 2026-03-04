@@ -7,34 +7,12 @@
  *******************************/
 
 // ---- SECURE AUTHENTICATION ----
+// enforce_secure_auth() and db() are provided by auth.php → load_env.php
 require_once 'auth.php';
-
-function enforce_secure_auth(): void {
-    // Redirect to login if not authenticated
-    if (!is_logged_in()) {
-        header('Location: login.php');
-        exit;
-    }
-}
 
 // Enforce auth and set anti-indexing header very early
 enforce_secure_auth();
 header('X-Robots-Tag: noindex, nofollow', true);
-
-// ---- DB ----
-if (!function_exists('db')) {
-function db(): PDO {
-    static $pdo = null;
-    if ($pdo === null) {
-        $dsn = 'mysql:host=localhost;dbname=investments;charset=utf8mb4';
-        $pdo = new PDO($dsn, 'root', 'gN6mCgrP!Gi6z9gxp', [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-    }
-    return $pdo;
-}
-}
 
 // Handle logout
 if (isset($_GET['logout'])) {
@@ -48,10 +26,11 @@ $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     try {
         $pdo = db();
     } catch (Exception $e) {
-        $error = "Database connection failed: " . $e->getMessage();
+        $error = "Database connection failed. Please try again later.";
     }
     
     if (isset($_POST['add_ticker']) && isset($pdo)) {
@@ -77,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Ticker '{$ticker}' added successfully!";
         } catch (Exception $e) {
             $pdo->rollBack();
-            $error = "Error adding ticker: " . $e->getMessage();
+            $error = "Error adding ticker. Please check your input and try again.";
         }
     }
     
@@ -131,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Ticker '{$ticker}' updated successfully!";
         } catch (Exception $e) {
             $pdo->rollBack();
-            $error = "Error updating ticker: " . $e->getMessage();
+            $error = "Error updating ticker. Please check your input and try again.";
         }
     }
     
@@ -152,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Ticker '{$ticker}' deleted successfully!";
         } catch (Exception $e) {
             $pdo->rollBack();
-            $error = "Error deleting ticker: " . $e->getMessage();
+            $error = "Error deleting ticker. Please try again.";
         }
     }
 }
@@ -489,6 +468,7 @@ try {
     <div class="card">
         <h2>Add New Ticker</h2>
         <form method="POST" action="">
+            <?= csrf_field() ?>
             <div class="form-row">
                 <div class="form-group">
                     <label for="ticker">Ticker Symbol *</label>
@@ -559,6 +539,7 @@ try {
                     <td class="display-mode">
                         <button type="button" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; margin-right: 0.25rem;" onclick="editTicker('<?= htmlspecialchars($ticker['ticker']) ?>')">Edit</button>
                         <form method="POST" action="" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this ticker?')">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="ticker" value="<?= htmlspecialchars($ticker['ticker']) ?>">
                             <button type="submit" name="delete_ticker" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Delete</button>
                         </form>
@@ -567,6 +548,7 @@ try {
                     <!-- Edit Mode -->
                     <td class="edit-mode" style="display: none;">
                         <form method="POST" action="" id="edit-form-<?= htmlspecialchars($ticker['ticker']) ?>">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="original_ticker" value="<?= htmlspecialchars($ticker['ticker']) ?>">
                             <input type="text" name="ticker" value="<?= htmlspecialchars($ticker['ticker']) ?>" style="width: 100%; padding: 0.25rem; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 3px;" required>
                         </form>

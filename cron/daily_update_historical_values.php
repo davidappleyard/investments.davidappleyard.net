@@ -13,24 +13,25 @@
  * - Command line argument support for date override
  */
 
-// Include only the necessary functions without the web interface
-// We'll define the essential functions here to avoid authentication issues
+// Load credentials from .env (one level up from cron/)
+require_once __DIR__ . '/../load_env.php';
+load_env();
 
 // Database connection function
 function db(): PDO {
-    $host = 'localhost';
-    $dbname = 'investments'; // Update this with your actual database name
-    $username = 'root';    // Update this with your actual username
-    $password = 'gN6mCgrP!Gi6z9gxp';    // Update this with your actual password
-    
     try {
-        $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
+        $pdo = new PDO(
+            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET,
+            DB_USER,
+            DB_PASS,
+            [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]
+        );
         return $pdo;
     } catch (PDOException $e) {
-        throw new Exception("Database connection failed: " . $e->getMessage());
+        throw new Exception("Database connection failed.");
     }
 }
 
@@ -144,7 +145,7 @@ function prepend_log_block($log_file, $content) {
         // Ensure logs directory exists
         $log_dir = dirname($log_file);
         if ($log_dir && !is_dir($log_dir)) {
-            mkdir($log_dir, 0755, true);
+            mkdir($log_dir, 0700, true);
         }
         
         // Read existing content if file exists
@@ -173,11 +174,16 @@ function log_and_echo($message) {
 // Get the date to process (default: today, can be overridden with command line argument)
 $targetDate = isset($argv[1]) ? $argv[1] : date('Y-m-d');
 
-// Validate date format
+// Validate date format and actual date value
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $targetDate)) {
     echo "ERROR: Invalid date format. Use YYYY-MM-DD format.\n";
     echo "Usage: php daily_update_historical_values.php [YYYY-MM-DD]\n";
     echo "Example: php daily_update_historical_values.php 2025-01-26\n";
+    exit(1);
+}
+$parsedDate = DateTime::createFromFormat('Y-m-d', $targetDate);
+if (!$parsedDate || $parsedDate->format('Y-m-d') !== $targetDate) {
+    echo "ERROR: Invalid date '$targetDate'. Ensure the month and day are valid (e.g. not Feb 30).\n";
     exit(1);
 }
 
@@ -286,8 +292,10 @@ try {
     }
     
 } catch (Exception $e) {
-    echo "\nERROR: " . $e->getMessage() . "\n";
-    echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
+    $error_msg = "[" . date('Y-m-d H:i:s') . "] ERROR: " . $e->getMessage() . "\n"
+               . $e->getTraceAsString() . "\n";
+    prepend_log_block("../logs/daily_update_historical_values.log", $error_msg);
+    echo "ERROR: " . $e->getMessage() . " (details written to log file)\n";
     exit(1);
 }
 ?>

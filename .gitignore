@@ -2,3 +2,9 @@
 CLAUDE.md
 .cursor/
 
+## Sensitive configuration — never commit credentials
+.env
+
+## Log files
+*.log
+logs/
