@@ -1491,7 +1491,7 @@ try {
           }
           
           // Calculate gain/loss by subtracting deposits/withdrawals from today's value
-          // For "Today": compare today's value (minus today's deposits/withdrawals) to yesterday's value
+          // For "Today": compare today's value (minus today's deposits/withdrawals) to yesterday's value from historical table
           $todayGainLoss = ($currentTotal - $todayDepositsWithdrawals) - $yesterdayTotal;
           
           // For "This Month": compare today's value (minus all deposits/withdrawals since last month-end) to last month-end's value
