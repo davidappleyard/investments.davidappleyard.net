@@ -1,0 +1,5 @@
+# Dependencies for the Investment Portfolio MCP server (python/mcp_server.py)
+# Install with: pip install -r python/requirements-mcp.txt
+mcp[cli]>=1.0.0
+mysql-connector-python>=8.0.0
+uvicorn>=0.30.0
