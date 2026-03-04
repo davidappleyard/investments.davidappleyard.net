@@ -228,6 +228,124 @@ def get_portfolio_summary(
 
 
 @mcp.tool()
+def get_daily_gain_loss(
+    client: Optional[str] = None,
+    account_type: Optional[str] = None,
+) -> dict:
+    """
+    Today's gain or loss compared to the previous trading day.
+
+    Mirrors the 'Gain/Loss Today' widget on the dashboard: today's value is
+    calculated in real-time from live prices (hl_prices_latest), while the
+    baseline is the most recent snapshot in hl_account_values_historical
+    (falls back to Friday if yesterday was a weekend/holiday).
+
+    Any deposits or withdrawals made today are excluded so they don't inflate
+    or deflate the gain/loss figure.
+
+    Args:
+        client: Filter by "David" or "Jen". Omit for combined view.
+        account_type: Filter by "SIPP", "ISA", or "Fund & Share". Omit for all.
+    """
+    validate(client, account_type)
+    today     = dt.date.today()
+    yesterday = today - dt.timedelta(days=1)
+
+    conn = db_conn()
+    cur  = conn.cursor(dictionary=True)
+    try:
+        f_clauses, f_params = conditions(client, account_type, alias="t")
+        c_clauses, c_params = conditions(client, account_type)
+
+        # ── Today's value (live prices) ──────────────────────────────────────
+        cur.execute(f"""
+            SELECT t.client_name, t.account_type, t.ticker,
+                   SUM(CASE WHEN t.type = 'Buy' THEN t.quantity ELSE -t.quantity END) AS net_qty
+            FROM hl_transactions t
+            WHERE t.type IN ('Buy', 'Sell')
+            {and_from(f_clauses)}
+            GROUP BY t.client_name, t.account_type, t.ticker
+            HAVING net_qty > 0
+        """, f_params)
+        holdings = cur.fetchall()
+
+        cur.execute("SELECT ticker, price, currency FROM hl_prices_latest")
+        prices = {r["ticker"]: r for r in cur.fetchall()}
+
+        cur.execute(f"""
+            SELECT client_name, account_type,
+                   SUM(CASE
+                       WHEN type IN ('Deposit','Interest','Sell','Dividend','Loyalty Payment') THEN value_gbp
+                       WHEN type IN ('Buy','Withdrawal','Fee') THEN -ABS(value_gbp)
+                       ELSE 0
+                   END) AS cash
+            FROM hl_transactions
+            {where_from(c_clauses)}
+            GROUP BY client_name, account_type
+        """, c_params)
+        cash_map = {(r["client_name"], r["account_type"]): float(r["cash"] or 0)
+                    for r in cur.fetchall()}
+
+        holdings_value = 0.0
+        for h in holdings:
+            ticker = h["ticker"]
+            if ticker in prices:
+                p = prices[ticker]
+                holdings_value += float(h["net_qty"]) * to_gbp(float(p["price"]), p["currency"])
+
+        total_cash = sum(cash_map.values())
+        current_total = holdings_value + total_cash
+
+        # ── Today's deposits/withdrawals (excluded from gain/loss) ───────────
+        d_today_clauses = list(c_clauses) + [
+            "type IN ('Deposit', 'Withdrawal')",
+            "trade_date = %s",
+        ]
+        cur.execute(f"""
+            SELECT COALESCE(SUM(value_gbp), 0) AS net
+            FROM hl_transactions
+            {where_from(d_today_clauses)}
+        """, c_params + [today.isoformat()])
+        today_deposits = float(cur.fetchone()["net"] or 0)
+
+        # ── Yesterday's value (most recent snapshot on or before yesterday) ──
+        cur.execute(f"""
+            SELECT MAX(trade_date) AS latest
+            FROM hl_account_values_historical
+            WHERE trade_date <= %s
+            {and_from(c_clauses)}
+        """, [yesterday.isoformat()] + c_params)
+        row = cur.fetchone()
+        baseline_date = row["latest"] if row else None
+
+        baseline_total = 0.0
+        if baseline_date:
+            cur.execute(f"""
+                SELECT SUM(total_value_gbp) AS total
+                FROM hl_account_values_historical
+                WHERE trade_date = %s
+                {and_from(c_clauses)}
+            """, [baseline_date] + c_params)
+            baseline_total = float(cur.fetchone()["total"] or 0)
+
+        gain_loss = (current_total - today_deposits) - baseline_total
+        pct       = (gain_loss / baseline_total * 100) if baseline_total else 0.0
+
+        return {
+            "current_value_gbp":   round(current_total, 2),
+            "baseline_value_gbp":  round(baseline_total, 2),
+            "baseline_date":       baseline_date.isoformat() if baseline_date else None,
+            "today_deposits_gbp":  round(today_deposits, 2),
+            "gain_loss_gbp":       round(gain_loss, 2),
+            "gain_loss_pct":       round(pct, 4),
+            "as_of":               today.isoformat(),
+        }
+    finally:
+        cur.close()
+        conn.close()
+
+
+@mcp.tool()
 def get_holdings(
     client: Optional[str] = None,
     account_type: Optional[str] = None,
