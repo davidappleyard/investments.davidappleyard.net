@@ -1420,7 +1420,10 @@ try {
             FROM hl_account_values_historical
             WHERE trade_date = ?
           ");
-          $stmt->execute([$yesterday]);
+          // The cron runs at midnight and stores today's entry using yesterday's closing prices
+          // (since the price fetch runs at 18:00, after UK market close at 4:30pm).
+          // So historical[today] IS yesterday's close — the correct baseline for "Gain/Loss Today".
+          $stmt->execute([$today]);
           $yesterdayTotal = (float)($stmt->fetch()['total_portfolio'] ?? 0);
           
           $stmt->execute([$lastMonthEnd]);
