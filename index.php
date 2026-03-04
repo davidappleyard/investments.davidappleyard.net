@@ -1414,21 +1414,24 @@ try {
             }
           }
           
-          // Get historical totals from database
+          // Get historical totals from database.
+          // Uses "most recent entry on or before date" to handle weekends and missing entries
+          // (e.g. if yesterday was a Sunday there will be no entry for it, so we fall back to Friday).
           $stmt = $pdo->prepare("
             SELECT SUM(total_value_gbp) as total_portfolio
             FROM hl_account_values_historical
-            WHERE trade_date = ?
+            WHERE trade_date = (
+              SELECT MAX(trade_date)
+              FROM hl_account_values_historical
+              WHERE trade_date <= ?
+            )
           ");
-          // The cron runs at midnight and stores today's entry using yesterday's closing prices
-          // (since the price fetch runs at 18:00, after UK market close at 4:30pm).
-          // So historical[today] IS yesterday's close — the correct baseline for "Gain/Loss Today".
-          $stmt->execute([$today]);
+          $stmt->execute([$yesterday]);
           $yesterdayTotal = (float)($stmt->fetch()['total_portfolio'] ?? 0);
-          
+
           $stmt->execute([$lastMonthEnd]);
           $lastMonthEndTotal = (float)($stmt->fetch()['total_portfolio'] ?? 0);
-          
+
           $stmt->execute([$taxYearStart]);
           $taxYearStartTotal = (float)($stmt->fetch()['total_portfolio'] ?? 0);
           
