@@ -4,3 +4,6 @@
 ## Log files
 *.log
 logs/
+
+# macOS
+.DS_Store
