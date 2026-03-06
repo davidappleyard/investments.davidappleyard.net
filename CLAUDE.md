@@ -18,31 +18,39 @@ A personal investment portfolio tracking web application for two clients (David,
 
 ## Repository Structure
 
+Non-public files (`.env`, `CLAUDE.md`) live at the repo root, above the web root:
+
 ```
-investments.davidappleyard.net/
-├── index.php                      # Main application (~3,700 lines) — dashboard, reports, CSV import
-├── login.php                      # Login page
-├── auth.php                       # Authentication helpers + table creation (users, remember_tokens)
-├── change_password.php            # Password change form
-├── settings.php                   # Ticker/allocation management
+investments.davidappleyard.net/    ← repo root (NOT web-accessible)
+├── .env                           # DB credentials & secrets (gitignored)
+├── .env.example                   # Template for .env
+├── CLAUDE.md                      # This file
 │
-├── python/
-│   ├── fetch_daily_prices.py      # Cron: fetch latest prices after market close (weekdays 18:00)
-│   ├── fetch_dividend_yields.py   # Cron: fetch dividend yields (weekdays 19:00)
-│   ├── fetch_historical_prices.py # One-time: backfill historical price data
-│   ├── fetch_prices.py            # Utility: manual price fetching
-│   ├── mcp_server.py              # Remote MCP server for Claude.ai integration
-│   ├── requirements-mcp.txt       # Python deps for MCP server (mcp, uvicorn, mysql-connector)
-│   ├── investment-mcp.service     # Systemd unit file for the MCP server
-│   └── MCP_SETUP.md               # Full deployment guide for the MCP server
-│
-├── cron/
-│   └── daily_update_historical_values.php  # Cron: calculate and store daily account valuations
-│
-└── one-off-scripts/
-    ├── backfill_dividend_tickers.php        # One-time: populate ticker/dividend data
-    ├── backfill_historical_values.php       # One-time: backfill account value history
-    └── check_historical_progress.php        # Diagnostic: verify historical data completeness
+└── public_html/                   ← web root (served by Apache/Nginx)
+    ├── index.php                  # Main application (~3,700 lines) — dashboard, reports, CSV import
+    ├── login.php                  # Login page
+    ├── auth.php                   # Authentication helpers + table creation (users, remember_tokens)
+    ├── change_password.php        # Password change form
+    ├── settings.php               # Ticker/allocation management
+    ├── load_env.php               # Loads .env from repo root (one level above public_html)
+    │
+    ├── python/
+    │   ├── fetch_daily_prices.py      # Cron: fetch latest prices after market close (weekdays 18:00)
+    │   ├── fetch_dividend_yields.py   # Cron: fetch dividend yields (weekdays 19:00)
+    │   ├── fetch_historical_prices.py # One-time: backfill historical price data
+    │   ├── fetch_prices.py            # Utility: manual price fetching
+    │   ├── mcp_server.py              # Remote MCP server for Claude.ai integration
+    │   ├── requirements-mcp.txt       # Python deps for MCP server (mcp, uvicorn, mysql-connector)
+    │   ├── investment-mcp.service     # Systemd unit file for the MCP server
+    │   └── MCP_SETUP.md               # Full deployment guide for the MCP server
+    │
+    ├── cron/
+    │   └── daily_update_historical_values.php  # Cron: calculate and store daily account valuations
+    │
+    └── one-off-scripts/
+        ├── backfill_dividend_tickers.php        # One-time: populate ticker/dividend data
+        ├── backfill_historical_values.php       # One-time: backfill account value history
+        └── check_historical_progress.php        # Diagnostic: verify historical data completeness
 ```
 
 ## Database Schema
@@ -62,17 +70,8 @@ Key tables (all prefixed with `hl_`):
 | `users` | Authentication (auto-created by `auth.php`) |
 | `remember_tokens` | Persistent "remember me" session tokens (auto-created) |
 
-Database connection constants are defined at the top of each PHP file:
+Database credentials are stored in `.env` at the repo root (above `public_html/`) and loaded by `load_env.php` into PHP constants. Python scripts read the same values from environment variables:
 
-```php
-const DB_HOST = 'localhost';
-const DB_NAME = 'investments';
-const DB_USER = 'root';
-const DB_PASS = 'gN6mCgrP!Gi6z9gxp';
-const DB_CHARSET = 'utf8mb4';
-```
-
-Python scripts support environment variable overrides:
 ```python
 DB_HOST = os.getenv("DB_HOST", "localhost")
 # DB_NAME, DB_USER, DB_PASS follow the same pattern
@@ -85,11 +84,14 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 No build step required. The application runs directly under a PHP web server (Apache/Nginx) or PHP CLI's built-in server:
 
 ```bash
+cd public_html
 php -S localhost:8080
 # Then open http://localhost:8080/index.php
 ```
 
 Ensure the `investments` MySQL database exists and the DB user has full access to it. Tables are created automatically on first load by `auth.php`.
+
+The web server's document root must be set to `public_html/`. The `.env` file lives one level above at the repo root — `load_env.php` resolves it via `dirname(__DIR__)`.
 
 ### Cron Job Setup
 

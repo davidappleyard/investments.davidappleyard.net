@@ -5,7 +5,7 @@
  * Supports KEY=VALUE format; lines starting with # are comments.
  */
 function load_env(): void {
-    $path = __DIR__ . '/.env';
+    $path = dirname(__DIR__) . '/.env';
     if (!file_exists($path)) {
         throw new RuntimeException(
             'Missing .env file. Copy .env.example to .env and configure your database credentials.'
