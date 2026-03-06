@@ -6,12 +6,12 @@ Wants=mysql.service mariadb.service
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/investments.davidappleyard.net
+WorkingDirectory=/var/www/html/investments.davidappleyard.net
 
 # Load credentials from .env — adjust path if your .env lives elsewhere
-EnvironmentFile=/var/www/investments.davidappleyard.net/.env
+EnvironmentFile=/var/www/html/investments.davidappleyard.net/.env
 
-ExecStart=/usr/bin/python3 /var/www/investments.davidappleyard.net/python/mcp_server.py
+ExecStart=/usr/bin/python3 /var/www/html/investments.davidappleyard.net/public_html/python/mcp_server.py
 Restart=on-failure
 RestartSec=10
 
