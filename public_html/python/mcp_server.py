@@ -376,7 +376,7 @@ def get_holdings(
                 SUM(CASE WHEN t.type = 'Buy' THEN t.quantity  ELSE 0            END)     AS total_bought_qty,
                 SUM(CASE WHEN t.type = 'Buy' THEN t.quantity  ELSE -t.quantity  END)     AS net_qty,
                 SUM(CASE WHEN t.type = 'Buy' THEN t.value_gbp ELSE 0            END)     AS total_cost_gbp,
-                s.allocation,
+                s.target_allocation,
                 p.price     AS latest_price,
                 p.currency,
                 y.dividend_yield
@@ -387,7 +387,7 @@ def get_holdings(
             WHERE t.type IN ('Buy', 'Sell')
             {and_from(f_clauses)}
             GROUP BY t.client_name, t.account_type, t.ticker,
-                     s.allocation, p.price, p.currency, y.dividend_yield
+                     s.target_allocation, p.price, p.currency, y.dividend_yield
             HAVING net_qty > 0
             ORDER BY t.client_name, t.account_type, t.ticker
         """, f_params)
@@ -432,7 +432,7 @@ def get_holdings(
                 "cost_basis_gbp":       round(cost_basis, 2),
                 "unrealised_gain_gbp":  unreal_gbp,
                 "unrealised_gain_pct":  unreal_pct,
-                "allocation":           r["allocation"],
+                "allocation":           r["target_allocation"],
                 "dividend_yield_pct":   round(float(r["dividend_yield"]), 2) if r["dividend_yield"] else None,
             })
 
@@ -747,12 +747,12 @@ def get_allocation_breakdown(
         cur.execute(f"""
             SELECT t.ticker,
                    SUM(CASE WHEN t.type = 'Buy' THEN t.quantity ELSE -t.quantity END) AS net_qty,
-                   COALESCE(s.allocation, 'Unclassified') AS allocation
+                   COALESCE(s.target_allocation, 'Unclassified') AS allocation
             FROM hl_transactions t
             LEFT JOIN hl_ticker_symbols s ON t.ticker = s.ticker
             WHERE t.type IN ('Buy', 'Sell')
             {and_from(f_clauses)}
-            GROUP BY t.ticker, s.allocation
+            GROUP BY t.ticker, s.target_allocation
             HAVING net_qty > 0
         """, f_params)
         holdings = cur.fetchall()
