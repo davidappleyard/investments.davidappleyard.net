@@ -11,7 +11,7 @@ WorkingDirectory=/var/www/html/investments.davidappleyard.net
 # Load credentials from .env — adjust path if your .env lives elsewhere
 EnvironmentFile=/var/www/html/investments.davidappleyard.net/.env
 
-ExecStart=/usr/bin/python3 /var/www/html/investments.davidappleyard.net/public_html/python/mcp_server.py
+ExecStart=/opt/investment-mcp-venv/bin/python3 /var/www/html/investments.davidappleyard.net/public_html/python/mcp_server.py
 Restart=on-failure
 RestartSec=10
 
