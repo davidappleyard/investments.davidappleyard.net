@@ -381,9 +381,9 @@ def get_holdings(
                 p.currency,
                 y.dividend_yield
             FROM hl_transactions t
-            LEFT JOIN hl_ticker_symbols s ON t.ticker = s.ticker
-            LEFT JOIN hl_prices_latest  p ON t.ticker = p.ticker
-            LEFT JOIN hl_yield_latest   y ON t.ticker = y.ticker
+            LEFT JOIN hl_ticker_symbols s ON t.ticker COLLATE utf8mb4_unicode_ci = s.ticker COLLATE utf8mb4_unicode_ci
+            LEFT JOIN hl_prices_latest  p ON t.ticker COLLATE utf8mb4_unicode_ci = p.ticker COLLATE utf8mb4_unicode_ci
+            LEFT JOIN hl_yield_latest   y ON t.ticker COLLATE utf8mb4_unicode_ci = y.ticker COLLATE utf8mb4_unicode_ci
             WHERE t.type IN ('Buy', 'Sell')
             {and_from(f_clauses)}
             GROUP BY t.client_name, t.account_type, t.ticker,
@@ -749,7 +749,7 @@ def get_allocation_breakdown(
                    SUM(CASE WHEN t.type = 'Buy' THEN t.quantity ELSE -t.quantity END) AS net_qty,
                    COALESCE(s.target_allocation, 'Unclassified') AS allocation
             FROM hl_transactions t
-            LEFT JOIN hl_ticker_symbols s ON t.ticker = s.ticker
+            LEFT JOIN hl_ticker_symbols s ON t.ticker COLLATE utf8mb4_unicode_ci = s.ticker COLLATE utf8mb4_unicode_ci
             WHERE t.type IN ('Buy', 'Sell')
             {and_from(f_clauses)}
             GROUP BY t.ticker, s.target_allocation
